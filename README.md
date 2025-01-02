@@ -1,12 +1,11 @@
-# 403-bypass
-403-bypass 
-# Technique 
-Url encode
-Header based 
+# 403 Bypass Tool
 
-# Installation
+A tool to test various payloads and headers to bypass HTTP 403 Forbidden responses.
 
-git clone https://github.com/nithin644/403-bypass/
-cd 403-bypass
-chmod +x 403-bypass.py
-python 403-bypass.py
+## Installation
+
+Follow the steps below to install and run the tool:
+
+1. Clone the repository and navigate to the directory:
+   ```bash
+   git clone https://github.com/nithin644/403-bypass/ && cd 403-bypass
