@@ -1,14 +1,11 @@
-# 403 Bypass Tool
+# 403 Bypass
 
-A tool to test various payloads and headers to bypass HTTP 403 Forbidden responses.
+## Steps to Run the Script
 
-## Installation
+Follow these steps to set up and run the 403 Bypass script.
 
-Follow the steps below to install and run the tool:
+### 1. Clone the Repository
+Clone the repository to your local machine:
+```bash
+git clone https://github.com/nithin644/403-bypass/
 
-1. Clone the repository and navigate to the directory:
-   ```bash
-   git clone https://github.com/nithin644/403-bypass/
-2. go to Directory:
- ```bash
-cd 403-bypass
