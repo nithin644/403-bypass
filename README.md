@@ -1,82 +1,128 @@
-# 403 Bypass Testing Tool
+# 403 Bypass — Professional Recon & Response Analysis
 
-## Overview
+An accuracy-first utility for security professionals to analyze HTTP 403 responses, reduce false positives, and identify legitimate access-control bypasses using advanced request techniques and response fingerprinting.
 
-**403 Bypass Testing Tool** is an advanced Python utility crafted for professional penetration testers and bug bounty hunters. Its mission: to automate the discovery of misconfigured access controls and explore ways to bypass 403 Forbidden restrictions on web servers using proven URL and HTTP header manipulation techniques.
+This repository contains the scanner [403_bypass_v3.py](403_bypass_v3.py) and payload lists used for testing.
 
-> **Author:** Nithin
-
----
-
-## Features
-
-- 🚀 **Automated Testing:** Effortlessly tests a wide range of known 403 bypass payloads—URL-walking, path manipulation, and header-based tricks.
-- ⚡ **Multi-Threaded:** Fast and efficient, thanks to concurrent execution with user-controlled thread count.
-- 🌈 **Interactive & Colorful:** Clean, color-coded terminal output—quickly spot successful bypasses, warnings, and errors.
-- 🧰 **Custom Wordlists:** Easily swap or extend with your own payload and header lists.
-- 📄 **Comprehensive Reporting:** Save all discovered bypasses in a CSV file for further analysis or responsible disclosure.
-- 🔁 **Robust:** Implements session retries, configurable timeouts, and SSL verification options for reliable scanning in all network conditions.
+Author: Nithin
 
 ---
 
-## Usage
+## Key Capabilities
 
-1. **Install requirements**
-pip install -r requirements.txt --break-system-packages
-
-text
-
-2. **Single Target Example**
-python3 403bypass.py -u https://example.com/secret/
-
-text
-
-3. **Multiple Targets Example**
-python3 403bypass.py -l urls.txt
-
-text
-
-4. **Save Results**
-python3 403bypass.py -u https://example.com/protected/ -o bypasses.csv
-
-text
-
-5. **Customize Payloads/Headers**
-- Edit `403_url_payloads.txt` for URL tricks.
-- Edit `403_header_payloads.txt` for header manipulations.
-
-6. **Threads & Timeout**
-python3 403bypass.py -u https://example.com/ -t 10 --timeout 5
-
-text
-
-7. **Disable SSL Verification**
-python3 403bypass.py -u https://example.com/ --no-verify
-
-text
+- UI: interactive console with colorized output (Colorama) and a modern ASCII banner.
+- Input modes: single `-u/--url` or multi-target `-l/--list` (file of URLs).
+- Request engine: `requests.Session()` with connection pooling, `HTTPAdapter` retries (exponential backoff), `ThreadPoolExecutor` for concurrent tests, user-agent rotation, per-request timeout, and `--no-verify` SSL toggle.
+- Payloads: customizable URL and header payload lists (`403_url_payloads.txt`, `403_header_payloads.txt`).
+- Fingerprinting: records status code, HTML `<title>`, content length, SHA256 body hash, and redirect chain.
+- Similarity analysis: `difflib.SequenceMatcher()` to compare candidate responses against the baseline 403, reducing false positives.
+- Classifications: results are labeled as `NO CHANGE`, `POSSIBLE DIFFERENCE`, `HIGH CONFIDENCE`, `WAF BLOCK`, or `FALSE POSITIVE`.
+- WAF detection: simple heuristics for Cloudflare, Akamai, Imperva, Sucuri, F5, ModSecurity (body + header signatures).
+- Outputs: human-friendly `results.txt` and line-delimited JSON `results.json` for programmatic consumption.
+- Reporting: rich CLI tables via `rich` and progress indicators via `tqdm`.
 
 ---
 
-## Example Output
+## Installation
 
-[i] Loaded 50 URL payloads
-[+] Bypass successful: https://example.com/secret/.;/
-[+] Bypass successful: X-Original-URL: /admin/login
-Test summary: Total tests=100, Bypasses=2, Errors=0
-Saved 2 bypasses to bypasses.csv
+1. Create a virtual environment (recommended):
 
-text
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
 
----
+2. Install dependencies:
 
-## Responsible Usage
-
-- **Authorization Required:** Only test targets where you have clear, explicit permission.
-- **No Malicious Activity:** This tool is **for security research, penetration testing, and bug bounty use**—never for illegal hacking or unauthorized probing.
-- Always report vulnerabilities responsibly via proper disclosure processes.
+```bash
+python3 -m pip install -r requirements.txt
+```
 
 ---
 
-## Acknowledgments
+## Quick Start
 
-Inspired by community research and the collaborative efforts of the bug bounty and ethical hacking community. Contributions, feature requests, and PRs are welcome!
+- Interactive mode:
+
+```bash
+python3 403_bypass_v3.py
+```
+
+- Single URL:
+
+```bash
+python3 403_bypass_v3.py -u https://example.com/secret/
+```
+
+- Multiple targets from a file:
+
+```bash
+python3 403_bypass_v3.py -l urls.txt
+```
+
+- Common flags:
+
+- `-p/--payloads` : path to URL payload file (default: 403_url_payloads.txt)
+- `--headers-file` : path to header payload file (default: 403_header_payloads.txt)
+- `-o/--output` : human-readable output file (default: results.txt)
+- `--no-verify` : disable SSL cert verification
+- `--combine` : test URL payload + header payload combinations (slower)
+- `-t/--threads` : number of worker threads
+- `--timeout` : request timeout in seconds
+
+Example with options:
+
+```bash
+python3 403_bypass_v3.py -u https://example.com -t 20 --timeout 7 --combine -o results.txt
+```
+
+---
+
+## Output Formats
+
+- `results.txt` — human-readable append log of confirmed bypasses (URL, payload, header, status, length, title).
+- `results.json` — line-delimited JSON objects, example record:
+
+```json
+{
+	"url": "https://example.com/admin",
+	"status": 200,
+	"title": "Admin — Example",
+	"length": 2345,
+	"similarity": 0.1234,
+	"classification": "HIGH CONFIDENCE"
+}
+```
+
+---
+
+## Statistics & Reporting
+
+At the end of a run the scanner prints a summary table that includes:
+
+- Total requests sent
+- Bypasses found
+- WAF blocks detected
+- False positives filtered
+- Possible differences (low-confidence changes)
+- Redirects observed
+- Errors
+
+The tool also prints a compact Rich table of findings for quick review.
+
+---
+
+## Customization
+
+- Extend or replace payloads by editing [403_url_payloads.txt](403_url_payloads.txt) and [403_header_payloads.txt](403_header_payloads.txt).
+- Adjust similarity threshold in the script (`SIMILARITY_THRESHOLD`) if you need stricter or looser matching.
+
+---
+
+## Responsible Use
+
+This tool is intended for authorized security testing only. You must have explicit written permission to test any target. The author and contributors are not responsible for misuse.
+
+---
+
+If you'd like, I can also add example `urls.txt`, CI checks, or a short demo script that runs a non-destructive scan against a local test server.
