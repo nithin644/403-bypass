@@ -2,7 +2,7 @@
 
 An accuracy-first utility for security professionals to analyze HTTP 403 responses, reduce false positives, and identify legitimate access-control bypasses using advanced request techniques and response fingerprinting.
 
-This repository contains the scanner [403_bypass_v3.py](403_bypass_v3.py) and payload lists used for testing.
+This repository contains the scanner [403_bypass_v3.py](403-bypass.py) and payload lists used for testing.
 
 Author: Nithin
 
