@@ -1,3 +1,6 @@
 requests
 colorama
 urllib3
+rich
+beautifulsoup4
+tqdm
